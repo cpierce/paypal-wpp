@@ -65,15 +65,15 @@ class PaypalWPP
             throw new \RuntimeException('Config payload required');
         }
 
-        if (!empty($config['username'])) {
+        if (empty($config['username'])) {
             throw new \RuntimeException('Username is required in payload');
         }
 
-        if (!empty($config['password'])) {
+        if (empty($config['password'])) {
             throw new \RuntimeException('Password is required in payload');
         }
 
-        if (!empty($config['signature'])) {
+        if (empty($config['signature'])) {
             throw new \RuntimeException('Signature is required in payload');
         }
 
