@@ -1,16 +1,13 @@
 {
     "name": "cpierce/paypal-wpp",
     "description": "Client library for Paypal Web Payments Pro.",
-    "keywords": ["paypal", "webpaymentspro", "wpp"],
-    "homepage": "https://www.github.com/cpierce/paypal-wpp",
     "license": "MIT",
     "version": "3.0",
-    "require": {
-        "php": ">=5.5"
-    },
+    "homepage": "https://github.com/cpierce/paypal-wpp",
     "autoload": {
         "psr-4": {
             "PaypalWPP\\": "src/PaypalWPP"
         }
-    }
+    },
+    "minimum-stability": "stable"
 }
