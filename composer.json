@@ -3,6 +3,9 @@
     "description": "Client library for Paypal Web Payments Pro.",
     "license": "MIT",
     "homepage": "https://github.com/cpierce/paypal-wpp",
+    "require": {
+        "php": ">=5.4"
+    },
     "autoload": {
         "psr-4": {
             "PaypalWPP\\": "src/PaypalWPP"
