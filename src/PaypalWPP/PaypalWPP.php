@@ -65,15 +65,15 @@ class PaypalWPP
             throw new \RuntimeException('Config payload required');
         }
 
-        if (!is_string($config['username'])) {
+        if (!empty($config['username'])) {
             throw new \RuntimeException('Username is required in payload');
         }
 
-        if (!is_string($config['password'])) {
+        if (!empty($config['password'])) {
             throw new \RuntimeException('Password is required in payload');
         }
 
-        if (!is_string($config['signature'])) {
+        if (!empty($config['signature'])) {
             throw new \RuntimeException('Signature is required in payload');
         }
 
@@ -81,7 +81,7 @@ class PaypalWPP
         $this->wppPassword = urlencode($config['password']);
         $this->wppSignature = urlencode($config['signature']);
 
-        if (is_string($config['endpoint'])) {
+        if (!empty($config['endpoint'])) {
             $this->wppEndpoint = urlencode($config['endpoint']);
         }
     }
