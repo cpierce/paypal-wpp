@@ -27,28 +27,28 @@ class PaypalWPP
      *
      * @var string
      */
-    private $wppEndpoint = 'https://api-3t.paypal.com/nvp';
+    protected $wppEndpoint = 'https://api-3t.paypal.com/nvp';
 
     /**
      * WPP username for connection.
      *
      * @var string
      */
-    private $wppUsername;
+    protected $wppUsername;
 
     /**
      * WPP password for connection.
      *
      * @var string
      */
-    private $wppPassword;
+    protected $wppPassword;
 
     /**
      * WPP signature for connection.
      *
      * @var string
      */
-    private $wppSignature;
+    protected $wppSignature;
 
     /**
      * Construct Method.
@@ -99,7 +99,7 @@ class PaypalWPP
     public function hash($method = null, $NVP = null)
     {
         $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, self::$wppEndpoint);
+        curl_setopt($curlHandler, CURLOPT_URL, self::wppEndpoint);
         curl_setopt($curlHandler, CURLOPT_POST, true);
         curl_setopt($curlHandler, CURLOPT_VERBOSE, true);
         curl_setopt($curlHandler, CURLOPT_SSL_VERIFYPEER, false);
