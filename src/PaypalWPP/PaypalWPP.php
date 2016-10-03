@@ -51,9 +51,9 @@ class PaypalWPP
     private $wppSignature;
 
     /**
-     * Set Config Method
+     * Set Config Method.
      *
-     * @var array $config
+     * @param array $config
      */
     private function _setConfig($config = [])
     {
@@ -94,10 +94,10 @@ class PaypalWPP
     private function _getConfig()
     {
         $config = [
-            'version'   => self::VERSION,
-            'endpoint'  => $this->wppEndpoint,
-            'username'  => $this->wppUsername,
-            'password'  => $this->wppPassword,
+            'version' => self::VERSION,
+            'endpoint' => $this->wppEndpoint,
+            'username' => $this->wppUsername,
+            'password' => $this->wppPassword,
             'signature' => $this->wppSignature,
         ];
 
@@ -117,21 +117,21 @@ class PaypalWPP
     /**
      * Do Direct Payment Method.
      *
-     * @param  array $data
+     * @param array $data
      *
-     * @return array | boolean
+     * @return array | bool
      */
     public function doDirectPayment($data)
     {
         $method = 'DoDirectPayment';
 
-        $data['first_name']   = urlencode($data['first_name']);
-        $data['last_name']    = urlencode($data['last_name']);
-        $data['amount']       = str_replace(['$', ' ', ','], '', $data['amount']);
-        $data['card_number']  = str_replace(['-', ' '], '', $data['card_number']);
+        $data['first_name'] = urlencode($data['first_name']);
+        $data['last_name'] = urlencode($data['last_name']);
+        $data['amount'] = str_replace(['$', ' ', ','], '', $data['amount']);
+        $data['card_number'] = str_replace(['-', ' '], '', $data['card_number']);
         $data['exp']['month'] = str_pad($data['exp']['month'], 2, '0', STR_PAD_LEFT);
 
-        switch($data['card_number'][0]) {
+        switch ($data['card_number'][0]) {
             case 3:
                 $data['card_type'] = 'Amex';
                 break;
@@ -146,22 +146,22 @@ class PaypalWPP
                 break;
         }
 
-        $NVP  = '&PAYMENTACTION=Sale';
-        $NVP .= '&AMT=' . $data['amount'];
-        $NVP .= '&CREDITCARDTYPE=' . $data['card_type'];
-        $NVP .= '&ACCT=' . $data['card_number'];
+        $NVP = '&PAYMENTACTION=Sale';
+        $NVP .= '&AMT='.$data['amount'];
+        $NVP .= '&CREDITCARDTYPE='.$data['card_type'];
+        $NVP .= '&ACCT='.$data['card_number'];
 
         if (!empty($data['cvv2'])) {
-            $NVP .= '&CVV2=' . $data['cvv2'];
+            $NVP .= '&CVV2='.$data['cvv2'];
         }
 
         if (!empty($data['invoice_number'])) {
-            $NVP .= '&INVNUM=' . $data['invoice_number'];
+            $NVP .= '&INVNUM='.$data['invoice_number'];
         }
 
-        $NVP .= '&EXPDATE=' . $data['exp']['month'] . $data['exp']['year'];
-        $NVP .= '&FIRSTNAME=' . $data['first_name'];
-        $NVP .= '&LASTNAME=' . $data['last_name'];
+        $NVP .= '&EXPDATE='.$data['exp']['month'].$data['exp']['year'];
+        $NVP .= '&FIRSTNAME='.$data['first_name'];
+        $NVP .= '&LASTNAME='.$data['last_name'];
         $NVP .= '&COUNTRYCODE=US';
         $NVP .= '&CURRENCYCODE=USD';
 
@@ -179,10 +179,10 @@ class PaypalWPP
      *
      * @throws \RuntimeException
      *
-     * @param  string $method
-     * @param  string $nvp
+     * @param string $method
+     * @param string $nvp
      *
-     * @return array | boolean
+     * @return array | bool
      */
     public function hash($method = null, $NVP = null)
     {
@@ -195,20 +195,19 @@ class PaypalWPP
         curl_setopt($curlHandler, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
 
+        $requiredNVP = 'METHOD='.$method;
+        $requiredNVP .= '&VERSION='.$config['version'];
+        $requiredNVP .= '&USER='.$config['username'];
+        $requiredNVP .= '&PWD='.$config['password'];
+        $requiredNVP .= '&SIGNATURE='.$config['signature'];
 
-        $requiredNVP  = 'METHOD=' . $method;
-        $requiredNVP .= '&VERSION=' . $config['version'];
-        $requiredNVP .= '&USER=' . $config['username'];
-        $requiredNVP .= '&PWD=' . $config['password'];
-        $requiredNVP .= '&SIGNATURE=' . $config['signature'];
-
-        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, $requiredNVP . $NVP);
+        curl_setopt($curlHandler, CURLOPT_POSTFIELDS, $requiredNVP.$NVP);
         $httpResponder = curl_exec($curlHandler);
 
         if (!$httpResponder) {
             throw new \RuntimeException(
-                $method . ' failed: ' . curl_error($curlHandler) . ' ('
-                . curl_errno($curlHandler) . ')'
+                $method.' failed: '.curl_error($curlHandler).' ('
+                .curl_errno($curlHandler).')'
             );
         }
 
@@ -224,8 +223,8 @@ class PaypalWPP
 
         if ((count($parsedResponse) < 1) || !array_key_exists('ACK', $parsedResponse)) {
             throw new \RuntimeException(
-                'Invalid HTTP Response for POST request (' . $requiredNVP
-                . $NVP . ') to ' . $config['endpoint']
+                'Invalid HTTP Response for POST request ('.$requiredNVP
+                .$NVP.') to '.$config['endpoint']
             );
         }
 
