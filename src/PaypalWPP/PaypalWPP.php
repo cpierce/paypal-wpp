@@ -27,35 +27,35 @@ class PaypalWPP
      *
      * @var string
      */
-    protected $wppEndpoint = 'https://api-3t.paypal.com/nvp';
+    private $wppEndpoint = 'https://api-3t.paypal.com/nvp';
 
     /**
      * WPP username for connection.
      *
      * @var string
      */
-    protected $wppUsername;
+    private $wppUsername;
 
     /**
      * WPP password for connection.
      *
      * @var string
      */
-    protected $wppPassword;
+    private $wppPassword;
 
     /**
      * WPP signature for connection.
      *
      * @var string
      */
-    protected $wppSignature;
+    private $wppSignature;
 
     /**
-     * Construct Method.
+     * Set Config Method
      *
-     * @param array $config
+     * @var array $config
      */
-    public function __construct($config)
+    private function _setConfig($config = [])
     {
         if (empty($config)) {
             throw new \RuntimeException('No config provided');
@@ -87,6 +87,34 @@ class PaypalWPP
     }
 
     /**
+     * Get Config Method.
+     *
+     * @return array
+     */
+    private function _getConfig()
+    {
+        $config = [
+            'version'   => self::VERSION,
+            'endpoint'  => $this->wppEndpoint,
+            'username'  => $this->wppUsername,
+            'password'  => $this->wppPassword,
+            'signature' => $this->wppSignature,
+        ];
+
+        return $config;
+    }
+
+    /**
+     * Construct Method.
+     *
+     * @param array $config
+     */
+    public function __construct($config)
+    {
+        $this->_setConfig($config);
+    }
+
+    /**
      * Web Payments Pro Hash Method.
      *
      * @throws \RuntimeException
@@ -99,7 +127,8 @@ class PaypalWPP
     public function hash($method = null, $NVP = null)
     {
         $curlHandler = curl_init();
-        curl_setopt($curlHandler, CURLOPT_URL, self::wppEndpoint);
+        $config = $this->_getConfig();
+        curl_setopt($curlHandler, CURLOPT_URL, $config['endpoint']);
         curl_setopt($curlHandler, CURLOPT_POST, true);
         curl_setopt($curlHandler, CURLOPT_VERBOSE, true);
         curl_setopt($curlHandler, CURLOPT_SSL_VERIFYPEER, false);
@@ -108,10 +137,10 @@ class PaypalWPP
 
 
         $requiredNVP  = 'METHOD=' . $method;
-        $requiredNVP .= '&VERSION=' . self::VERSION;
-        $requiredNVP .= '&USER=' . self::$wppUsername;
-        $requiredNVP .= '&PWD=' . self::$wppPassword;
-        $requiredNVP .= '&SIGNATURE=' . self::$wppSignature;
+        $requiredNVP .= '&VERSION=' . $config['version'];
+        $requiredNVP .= '&USER=' . $config['username'];
+        $requiredNVP .= '&PWD=' . $config['password'];
+        $requiredNVP .= '&SIGNATURE=' . $config['signature'];
 
         curl_setopt($curlHandler, CURLOPT_POSTFIELDS, $requiredNVP . $NVP);
         $httpResponder = curl_exec($curlHandler);
@@ -136,7 +165,7 @@ class PaypalWPP
         if ((count($parsedResponse) < 1) || !array_key_exists('ACK', $parsedResponse)) {
             throw new \RuntimeException(
                 'Invalid HTTP Response for POST request (' . $requiredNVP
-                . $NVP . ') to ' . self::$wppEndpoint
+                . $NVP . ') to ' . $config['endpoint']
             );
         }
 
