@@ -115,6 +115,66 @@ class PaypalWPP
     }
 
     /**
+     * Do Direct Payment Method.
+     *
+     * @param  array $data
+     *
+     * @return array | boolean
+     */
+    public function doDirectPayment($data)
+    {
+        $method = 'DoDirectPayment';
+
+        $data['first_name']   = urlencode($data['first_name']);
+        $data['last_name']    = urlencode($data['last_name']);
+        $data['amount']       = str_replace(['$', ' ', ','], '', $data['amount']);
+        $data['card_number']  = str_replace(['-', ' '], '', $data['card_number']);
+        $data['exp']['month'] = str_pad($data['exp']['month'], 2, '0', STR_PAD_LEFT);
+
+        switch($data['card_number'][0]) {
+            case 3:
+                $data['card_type'] = 'Amex';
+                break;
+            case 5:
+                $data['card_type'] = 'MasterCard';
+                break;
+            case 6:
+                $data['card_type'] = 'Discover';
+                break;
+            default:
+                $data['card_type'] = 'Visa';
+                break;
+        }
+
+        $NVP  = '&PAYMENTACTION=Sale';
+        $NVP .= '&AMT=' . $data['amount'];
+        $NVP .= '&CREDITCARDTYPE=' . $data['card_type'];
+        $NVP .= '&ACCT=' . $data['card_number'];
+
+        if (!empty($data['cvv2'])) {
+            $NVP .= '&CVV2=' . $data['cvv2'];
+        }
+
+        if (!empty($data['invoice_number'])) {
+            $NVP .= '&INVNUM=' . $data['invoice_number'];
+        }
+
+        $NVP .= '&EXPDATE=' . $data['exp']['month'] . $data['exp']['year'];
+        $NVP .= '&FIRSTNAME=' . $data['first_name'];
+        $NVP .= '&LASTNAME=' . $data['last_name'];
+        $NVP .= '&COUNTRYCODE=US';
+        $NVP .= '&CURRENCYCODE=USD';
+
+        $response = $this->hash($method, $NVP);
+
+        if (!empty($response)) {
+            return $response;
+        }
+
+        return false;
+    }
+
+    /**
      * Web Payments Pro Hash Method.
      *
      * @throws \RuntimeException
