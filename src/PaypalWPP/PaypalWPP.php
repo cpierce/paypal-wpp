@@ -129,7 +129,7 @@ class PaypalWPP
         $data['last_name'] = urlencode($data['last_name']);
         $data['amount'] = str_replace(['$', ' ', ','], '', $data['amount']);
         $data['card_number'] = str_replace(['-', ' '], '', $data['card_number']);
-        $data['exp']['month'] = str_pad($data['exp']['month'], 2, '0', STR_PAD_LEFT);
+        $data['expiration_date']['month'] = str_pad($data['expiration_date']['month'], 2, '0', STR_PAD_LEFT);
 
         switch ($data['card_number'][0]) {
             case 3:
@@ -159,7 +159,7 @@ class PaypalWPP
             $NVP .= '&INVNUM='.$data['invoice_number'];
         }
 
-        $NVP .= '&EXPDATE='.$data['exp']['month'].$data['exp']['year'];
+        $NVP .= '&EXPDATE='.$data['expiration_date']['month'].$data['expiration_date']['year'];
         $NVP .= '&FIRSTNAME='.$data['first_name'];
         $NVP .= '&LASTNAME='.$data['last_name'];
         $NVP .= '&COUNTRYCODE=US';
@@ -187,7 +187,8 @@ class PaypalWPP
     public function hash($method = null, $NVP = null)
     {
         $curlHandler = curl_init();
-        $config = $this->_getConfig();
+        $config      = $this->_getConfig();
+
         curl_setopt($curlHandler, CURLOPT_URL, $config['endpoint']);
         curl_setopt($curlHandler, CURLOPT_POST, true);
         curl_setopt($curlHandler, CURLOPT_VERBOSE, true);
@@ -195,7 +196,7 @@ class PaypalWPP
         curl_setopt($curlHandler, CURLOPT_SSL_VERIFYHOST, false);
         curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
 
-        $requiredNVP = 'METHOD='.$method;
+        $requiredNVP  = 'METHOD='.$method;
         $requiredNVP .= '&VERSION='.$config['version'];
         $requiredNVP .= '&USER='.$config['username'];
         $requiredNVP .= '&PWD='.$config['password'];
@@ -211,7 +212,7 @@ class PaypalWPP
             );
         }
 
-        $responder = explode('&', $httpResponder);
+        $responder      = explode('&', $httpResponder);
         $parsedResponse = [];
 
         foreach ($responder as $response) {
