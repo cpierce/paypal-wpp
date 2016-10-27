@@ -51,9 +51,20 @@ class PaypalWPP
     private $wppSignature;
 
     /**
+     * Construct Method.
+     *
+     * @param array $config
+     */
+    public function __construct($config)
+    {
+        $this->_setConfig($config);
+    }
+
+    /**
      * Set Config Method.
      *
      * @param array $config
+     *
      */
     private function _setConfig($config = [])
     {
@@ -82,7 +93,7 @@ class PaypalWPP
         $this->wppSignature = urlencode($config['signature']);
 
         if (!empty($config['endpoint'])) {
-            $this->wppEndpoint = urlencode($config['endpoint']);
+            $this->wppEndpoint = $config['endpoint'];
         }
     }
 
@@ -105,13 +116,13 @@ class PaypalWPP
     }
 
     /**
-     * Construct Method.
+     * Get Running Config Method.
      *
-     * @param array $config
+     * @return array
      */
-    public function __construct($config)
+    public function getRunningConfig()
     {
-        $this->_setConfig($config);
+        return $this->_getConfig();
     }
 
     /**
@@ -146,7 +157,7 @@ class PaypalWPP
                 break;
         }
 
-        $NVP = '&PAYMENTACTION=Sale';
+        $NVP  = '&PAYMENTACTION=Sale';
         $NVP .= '&AMT='.$data['amount'];
         $NVP .= '&CREDITCARDTYPE='.$data['card_type'];
         $NVP .= '&ACCT='.$data['card_number'];
@@ -168,7 +179,7 @@ class PaypalWPP
         $response = $this->hash($method, $NVP);
 
         if (!empty($response)) {
-            return $response;
+            return $this->getParsedResponse($response);
         }
 
         return false;
@@ -181,6 +192,8 @@ class PaypalWPP
      *
      * @param string $method
      * @param string $nvp
+     *
+     * @codeCoverageIgnore
      *
      * @return array | bool
      */
@@ -212,7 +225,19 @@ class PaypalWPP
             );
         }
 
-        $responder      = explode('&', $httpResponder);
+        return $httpResponder;
+    }
+
+    /**
+     * Get Parsed Response Method.
+     *
+     * @param  string $data
+     *
+     * @return array
+     */
+    public function getParsedResponse($data)
+    {
+        $responder      = explode('&', $data);
         $parsedResponse = [];
 
         foreach ($responder as $response) {
@@ -224,8 +249,7 @@ class PaypalWPP
 
         if ((count($parsedResponse) < 1) || !array_key_exists('ACK', $parsedResponse)) {
             throw new \RuntimeException(
-                'Invalid HTTP Response for POST request ('.$requiredNVP
-                .$NVP.') to '.$config['endpoint']
+                'Invalid HTTP Response for POST request.'
             );
         }
 
