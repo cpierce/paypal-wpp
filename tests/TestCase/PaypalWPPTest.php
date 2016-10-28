@@ -18,11 +18,23 @@ class PaypalWPPTest extends TestCase
     {
         return [
             [
-                [
+                [ // config
                     'username'  => 'testing@testing.com',
                     'password'  => 'password!',
                     'signature' => 'ABCD1234',
                     'endpoint'  => 'https://api-3t.paypal.com/nvp',
+                ],
+                [ // data
+                    'first_name'      => 'Chris',
+                    'last_name'       => 'Pierce',
+                    'amount'          => '$48.97',
+                    'card_number'     => '4111-1111-1111-1111',
+                    'cvv2'            => '389',
+                    'invoice_number'  => '31337',
+                    'expiration_date' => [
+                        'month'       => 2,
+                        'year'        => 2099,
+                    ],
                 ],
             ],
         ];
@@ -48,6 +60,55 @@ class PaypalWPPTest extends TestCase
 
 
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * Test String Sent Exception Method.
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testStringSentConfig()
+    {
+        $paypal = new PaypalWPP('hello');
+    }
+
+    /**
+     * Test No Username Sent Exception Method
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testNoUsernameSentConfig()
+    {
+        $paypal = new PaypalWPP([
+            'username'  => 'testing@testing.com',
+            'signature' => 'ABCD1234!'
+        ]);
+    }
+
+    /**
+     * Test No Password Sent Exception Method
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testNoPasswordSentConfig()
+    {
+        $paypal = new PaypalWPP([
+            'password'  => 'Password!',
+            'signature' => 'ABCD1234!'
+        ]);
+    }
+
+    /**
+     * Test No Signature Sent Exception Method
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testNoSignatureSentConfig()
+    {
+        $paypal = new PaypalWPP([
+            'username'  => 'testing@testing.com',
+            'password'  => 'Password!',
+        ]);
     }
 
     /**
@@ -94,21 +155,8 @@ class PaypalWPPTest extends TestCase
      *
      * @dataProvider providerTestConfig
      */
-    public function testDoDirectPayment($config)
+    public function testDoDirectPayment($config, $data)
     {
-        $data     = [
-            'first_name'      => 'Chris',
-            'last_name'       => 'Pierce',
-            'amount'          => '$48.97',
-            'card_number'     => '4111-1111-1111-1111',
-            'cvv2'            => '389',
-            'invoice_number'  => '31337',
-            'expiration_date' => [
-                'month'       => 2,
-                'year'        => 2099,
-            ]
-        ];
-
         $response = 'TRANSACTIONID=1234ABCD&ACK=Success';
         $expected = [
             'ACK'           => 'Success',
@@ -120,12 +168,32 @@ class PaypalWPPTest extends TestCase
             ->setMethods(['hash'])
             ->getMock();
 
-        $paypal->expects($this->once())
+        $clone = clone $paypal;
+        $clone->expects($this->once())
+            ->method('hash')
+            ->will($this->returnValue(false));
+
+        $paypal->expects($this->any())
             ->method('hash')
             ->will($this->returnValue($response));
 
-        $result = $paypal->doDirectPayment($data);
+        $result  = $paypal->doDirectPayment($data);
+
+        $data['card_number'] = '5111-1111-1111-1111';
+        $result2 = $paypal->doDirectPayment($data);
+
+        $data['card_number'] = '6111-1111-1111-1111';
+        $result3 = $paypal->doDirectPayment($data);
+
+        $data['card_number'] = '3111-111111-11111';
+        $result4 = $paypal->doDirectPayment($data);
+
+        $result5 = $clone->doDirectPayment($data);
 
         $this->assertEquals($result, $expected);
+        $this->assertEquals($result2, $expected);
+        $this->assertEquals($result3, $expected);
+        $this->assertEquals($result4, $expected);
+        $this->assertFalse($result5);
     }
 }

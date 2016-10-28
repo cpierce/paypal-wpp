@@ -68,10 +68,6 @@ class PaypalWPP
      */
     private function _setConfig($config = [])
     {
-        if (empty($config)) {
-            throw new \RuntimeException('No config provided');
-        }
-
         if (!is_array($config)) {
             throw new \RuntimeException('Config payload required');
         }
