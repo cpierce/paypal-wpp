@@ -5,7 +5,7 @@
  * @copyright Copyright (c) 2016, Chris Pierce
  * @author Chris Pierce <cpierce@csdurant.com>
  *
- * @link http://www.github.com/paypal-wpp
+ * @link http://www.github.com/cpierce/paypal-wpp
  */
 
 namespace PaypalWPP;
