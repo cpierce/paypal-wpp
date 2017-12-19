@@ -54,7 +54,7 @@ File: `composer.json`
 }
 ```
 
-Once you have this changed saved run `composer udpate` and let the package download
+Once you have this change saved run `composer update` and let the package download
 into the vendor app.
 
 ## General Configuration
