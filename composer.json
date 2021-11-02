@@ -1,6 +1,7 @@
 {
     "name": "cpierce/paypal-wpp",
     "description": "Client library for Paypal Web Payments Pro.",
+    "type": "cakephp-plugin",
     "license": "MIT",
     "homepage": "https://github.com/cpierce/paypal-wpp",
     "require": {
