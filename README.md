@@ -1,5 +1,5 @@
 # Paypal Web Payments Pro Package
-[![Build Status](https://travis-ci.org/cpierce/paypal-wpp.svg?branch=master)](https://travis-ci.org/cpierce/paypal-wpp)
+[![Build Status](https://travis-ci.com/cpierce/paypal-wpp.svg?branch=master)](https://app.travis-ci.com/github/cpierce/paypal-wpp)
 
 This package was written to interact with any PHP application, but I'll demo
 using CakePHP 3.x to show how to connect to it.
