@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace PaypalWPP\Test;
 
@@ -14,7 +15,7 @@ class PaypalWPPTest extends TestCase
     /**
      * Provider Test Config Method.
      */
-    public function providerTestConfig()
+    public function providerTestConfig(): array
     {
         return [
             [
@@ -47,7 +48,7 @@ class PaypalWPPTest extends TestCase
      *
      * @dataProvider providerTestConfig
      */
-    public function testGetRunningConfig($config)
+    public function testGetRunningConfig($config): void
     {
         $expected['username']  = urlencode($config['username']);
         $expected['password']  = urlencode($config['password']);
@@ -58,27 +59,28 @@ class PaypalWPPTest extends TestCase
         $paypal = new PaypalWPP($config);
         $result = $paypal->getRunningConfig();
 
-
         $this->assertEquals($expected, $result);
     }
 
     /**
      * Test String Sent Exception Method.
      *
-     * @expectedException \RuntimeException
+     * @throws \RuntimeException
      */
-    public function testStringSentConfig()
+    public function testStringSentConfig(): void
     {
+        $this->expectException(\RuntimeException::class);
         $paypal = new PaypalWPP('hello');
     }
 
     /**
      * Test No Username Sent Exception Method
      *
-     * @expectedException \RuntimeException
+     * @throws \RuntimeException
      */
-    public function testNoUsernameSentConfig()
+    public function testNoUsernameSentConfig(): void
     {
+        $this->expectException(\RuntimeException::class);
         $paypal = new PaypalWPP([
             'username'  => 'testing@testing.com',
             'signature' => 'ABCD1234!'
@@ -88,10 +90,11 @@ class PaypalWPPTest extends TestCase
     /**
      * Test No Password Sent Exception Method
      *
-     * @expectedException \RuntimeException
+     * @throws \RuntimeException
      */
-    public function testNoPasswordSentConfig()
+    public function testNoPasswordSentConfig(): void
     {
+        $this->expectException(\RuntimeException::class);
         $paypal = new PaypalWPP([
             'password'  => 'Password!',
             'signature' => 'ABCD1234!'
@@ -101,10 +104,11 @@ class PaypalWPPTest extends TestCase
     /**
      * Test No Signature Sent Exception Method
      *
-     * @expectedException \RuntimeException
+     * @throws \RuntimeException
      */
-    public function testNoSignatureSentConfig()
+    public function testNoSignatureSentConfig(): void
     {
+        $this->expectException(\RuntimeException::class);
         $paypal = new PaypalWPP([
             'username'  => 'testing@testing.com',
             'password'  => 'Password!',
@@ -118,7 +122,7 @@ class PaypalWPPTest extends TestCase
      *
      * @dataProvider providerTestConfig
      */
-    public function testGetParsedResponse($config)
+    public function testGetParsedResponse($config): void
     {
         $data     = 'TRANSACTIONID=1234ABCD&ACK=Success';
         $expected = [
@@ -138,10 +142,11 @@ class PaypalWPPTest extends TestCase
      * @param array $config
      *
      * @dataProvider providerTestConfig
-     * @expectedException \RuntimeException
+     * @throws \RuntimeException
      */
-    public function testGetParsedResponseException($config)
+    public function testGetParsedResponseException($config): void
     {
+        $this->expectException(\RuntimeException::class);
         $data     = 'TRANSACTIONID=1234ABCD&INVOICE=2222';
 
         $paypal = new PaypalWPP($config);
@@ -155,7 +160,7 @@ class PaypalWPPTest extends TestCase
      *
      * @dataProvider providerTestConfig
      */
-    public function testDoDirectPayment($config, $data)
+    public function testDoDirectPayment($config, $data): void
     {
         $response = 'TRANSACTIONID=1234ABCD&ACK=Success';
         $expected = [

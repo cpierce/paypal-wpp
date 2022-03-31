@@ -7,6 +7,7 @@
  *
  * @link http://www.github.com/cpierce/paypal-wpp
  */
+declare(strict_types = 1);
 
 namespace PaypalWPP;
 
@@ -136,7 +137,7 @@ class PaypalWPP
         $data['last_name'] = urlencode($data['last_name']);
         $data['amount'] = str_replace(['$', ' ', ','], '', $data['amount']);
         $data['card_number'] = str_replace(['-', ' '], '', $data['card_number']);
-        $data['expiration_date']['month'] = str_pad($data['expiration_date']['month'], 2, '0', STR_PAD_LEFT);
+        $data['expiration_date']['month'] = str_pad((string) $data['expiration_date']['month'], 2, '0', STR_PAD_LEFT);
 
         switch ($data['card_number'][0]) {
             case 3:

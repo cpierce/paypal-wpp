@@ -2,13 +2,13 @@
     "name": "cpierce/paypal-wpp",
     "description": "Client library for Paypal Web Payments Pro.",
     "type": "cakephp-plugin",
-    "license": "MIT",
+    "license": "GPL-3.0-or-later",
     "homepage": "https://github.com/cpierce/paypal-wpp",
     "require": {
-        "php": ">=5.4"
+        "php": ">=7.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "5.5.*"
+        "phpunit/phpunit": ">=9.5"
     },
     "autoload": {
         "psr-4": {
