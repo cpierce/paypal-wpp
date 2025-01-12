@@ -15,7 +15,6 @@ jobs:
     strategy:
       matrix:
         php-version: [8.0, 8.1, 8.2]
-        composer-flags: ["--prefer-lowest", ""]
 
     steps:
       - name: Checkout code
@@ -28,7 +27,7 @@ jobs:
           tools: composer
 
       - name: Install dependencies
-        run: composer install ${{ matrix.composer-flags }}
+        run: composer install
 
       - name: Run tests
         run: vendor/bin/phpunit
