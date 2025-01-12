@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace PaypalWPP\Test;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PaypalWPP\PaypalWPP;
 
 /**
@@ -14,8 +15,10 @@ class PaypalWPPTest extends TestCase
 
     /**
      * Provider Test Config Method.
+     *
+     * @return array<mixed>
      */
-    public function providerTestConfig(): array
+    public static function providerTestConfig(): array
     {
         return [
             [
@@ -44,11 +47,11 @@ class PaypalWPPTest extends TestCase
     /**
      * Test Get Running Config Method.
      *
-     * @param array $config
-     *
-     * @dataProvider providerTestConfig
+     * @param array<mixed> $config
+     * @return void
      */
-    public function testGetRunningConfig($config): void
+    #[DataProvider('providerTestConfig')]
+    public function testGetRunningConfig($config = []): void
     {
         $expected['username']  = urlencode($config['username']);
         $expected['password']  = urlencode($config['password']);
@@ -66,17 +69,23 @@ class PaypalWPPTest extends TestCase
      * Test String Sent Exception Method.
      *
      * @throws \RuntimeException
+     * @return void
      */
     public function testStringSentConfig(): void
     {
+        // Expect a RuntimeException when an invalid config (string) is sent
         $this->expectException(\RuntimeException::class);
-        $paypal = new PaypalWPP('hello');
+        $this->expectExceptionMessage('Config payload required');
+
+        // Pass a string to the contructor, which should trigger an exception
+        new PaypalWPP('hello');
     }
 
     /**
      * Test No Username Sent Exception Method
      *
      * @throws \RuntimeException
+     * @return void
      */
     public function testNoUsernameSentConfig(): void
     {
@@ -118,11 +127,13 @@ class PaypalWPPTest extends TestCase
     /**
      * Test Get Parsed Response Method.
      *
-     * @param array $config
+     * @param array<mixed> $config
      *
-     * @dataProvider providerTestConfig
+     * @throws \RuntimeException
+     * @return void
      */
-    public function testGetParsedResponse($config): void
+    #[DataProvider('providerTestConfig')]
+    public function testGetParsedResponse($config = []): void
     {
         $data     = 'TRANSACTIONID=1234ABCD&ACK=Success';
         $expected = [
@@ -139,12 +150,13 @@ class PaypalWPPTest extends TestCase
     /**
      * Test Get Parsed Response Exception Method.
      *
-     * @param array $config
+     * @param array<mixed> $config
      *
-     * @dataProvider providerTestConfig
      * @throws \RuntimeException
+     * @return void
      */
-    public function testGetParsedResponseException($config): void
+    #[DataProvider('providerTestConfig')]
+    public function testGetParsedResponseException($config = []): void
     {
         $this->expectException(\RuntimeException::class);
         $data     = 'TRANSACTIONID=1234ABCD&INVOICE=2222';
@@ -156,11 +168,12 @@ class PaypalWPPTest extends TestCase
     /**
      * Test Do Direct Payment Method.
      *
-     * @param array $config
-     *
-     * @dataProvider providerTestConfig
+     * @param array<mixed> $config
+     * @param array<mixed> $data
+     * @return void
      */
-    public function testDoDirectPayment($config, $data): void
+    #[DataProvider('providerTestConfig')]
+    public function testDoDirectPayment($config =[], $data = []): void
     {
         $response = 'TRANSACTIONID=1234ABCD&ACK=Success';
         $expected = [
@@ -170,17 +183,17 @@ class PaypalWPPTest extends TestCase
 
         $paypal = $this->getMockBuilder('PaypalWPP\PaypalWPP')
             ->setConstructorArgs([$config])
-            ->setMethods(['hash'])
+            ->onlyMethods(['hash'])
             ->getMock();
 
         $clone = clone $paypal;
         $clone->expects($this->once())
             ->method('hash')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $paypal->expects($this->any())
             ->method('hash')
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
         $result  = $paypal->doDirectPayment($data);
 

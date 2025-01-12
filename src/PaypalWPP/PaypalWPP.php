@@ -54,20 +54,27 @@ class PaypalWPP
     /**
      * Construct Method.
      *
-     * @param array $config
+     * @throws \RuntimeException
+     *
+     * @param array<mixed>|string $config
      */
-    public function __construct($config)
+    public function __construct($config = [])
     {
+        if (!is_array($config)) {
+            throw new \RuntimeException('Config payload required');
+        }
+
         $this->_setConfig($config);
     }
 
     /**
      * Set Config Method.
      *
-     * @param array $config
-     *
+     * @param array<string, mixed> $config
+     * @throws \RuntimeException
+     * @return void
      */
-    private function _setConfig($config = [])
+    private function _setConfig($config = []): void
     {
         if (!is_array($config)) {
             throw new \RuntimeException('Config payload required');
@@ -97,9 +104,9 @@ class PaypalWPP
     /**
      * Get Config Method.
      *
-     * @return array
+     * @return array<mixed>
      */
-    private function _getConfig()
+    private function _getConfig(): array
     {
         $config = [
             'version' => self::VERSION,
@@ -115,9 +122,9 @@ class PaypalWPP
     /**
      * Get Running Config Method.
      *
-     * @return array
+     * @return array<mixed>
      */
-    public function getRunningConfig()
+    public function getRunningConfig(): array
     {
         return $this->_getConfig();
     }
@@ -125,11 +132,11 @@ class PaypalWPP
     /**
      * Do Direct Payment Method.
      *
-     * @param array $data
+     * @param array<mixed> $data
      *
-     * @return array | bool
+     * @return array<mixed>|bool
      */
-    public function doDirectPayment($data)
+    public function doDirectPayment($data = []): array|bool
     {
         $method = 'DoDirectPayment';
 
@@ -175,7 +182,7 @@ class PaypalWPP
 
         $response = $this->hash($method, $NVP);
 
-        if (!empty($response)) {
+        if (is_string($response) && !empty($response)) {
             return $this->getParsedResponse($response);
         }
 
@@ -185,16 +192,16 @@ class PaypalWPP
     /**
      * Web Payments Pro Hash Method.
      *
-     * @throws \RuntimeException
-     *
      * @param string $method
-     * @param string $nvp
+     * @param string $NVP
+     *
+     * @throws \RuntimeException
      *
      * @codeCoverageIgnore
      *
-     * @return array | bool
+     * @return string|bool
      */
-    public function hash($method = null, $NVP = null)
+    public function hash($method = null, $NVP = null): string|bool
     {
         $curlHandler = curl_init();
         $config      = $this->_getConfig();
@@ -203,7 +210,7 @@ class PaypalWPP
         curl_setopt($curlHandler, CURLOPT_POST, true);
         curl_setopt($curlHandler, CURLOPT_VERBOSE, true);
         curl_setopt($curlHandler, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curlHandler, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curlHandler, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curlHandler, CURLOPT_RETURNTRANSFER, true);
 
         $requiredNVP  = 'METHOD='.$method;
@@ -228,11 +235,11 @@ class PaypalWPP
     /**
      * Get Parsed Response Method.
      *
-     * @param  string $data
+     * @param string $data
      *
-     * @return array
+     * @return array<mixed>
      */
-    public function getParsedResponse($data)
+    public function getParsedResponse(string $data = ''): array
     {
         $responder      = explode('&', $data);
         $parsedResponse = [];
